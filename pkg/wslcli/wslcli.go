@@ -6,12 +6,18 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"net"
 	"os/exec"
 	"strings"
 
 	"golang.org/x/text/encoding/unicode"
 	"golang.org/x/text/transform"
 )
+
+type iPInfo struct {
+	host  string
+	local string
+}
 
 //ip route get to 1.0.0.0 | head -1 | awk '{print $7}'
 
@@ -41,6 +47,39 @@ func ListAll() (string, error) {
 		return "", fmt.Errorf("failed to decode output: %w", err)
 	}
 	return decoded, nil
+}
+
+func GetIP(name string) (*iPInfo, error) {
+	cmd := exec.Command("wsl.exe", "-d", name, "--", "ip", "route", "get", "to", "1.0.0.0")
+	out, err := cmd.Output()
+	if err != nil {
+		return nil, fmt.Errorf("exec command(%s) failed: %w", strings.Join(cmd.Args, " "), err)
+	}
+
+	ipInfo := &iPInfo{}
+	scanner := bufio.NewScanner(bytes.NewReader(out))
+	for scanner.Scan() {
+		// 10.0.0.1 via 172.25.176.1 dev eth0 src 172.25.185.133 uid 1000
+		line := scanner.Text()
+		line = strings.TrimSpace(line)
+		info := strings.Split(line, " ")
+		if len(info) < 9 {
+			continue
+		}
+		hostIP := net.ParseIP(info[2])
+		if hostIP == nil || hostIP.To4() == nil {
+			continue
+		}
+		localIP := net.ParseIP(info[6])
+		if localIP == nil || localIP.To4() == nil {
+			continue
+		}
+		ipInfo.host = hostIP.String()
+		ipInfo.local = localIP.String()
+		return ipInfo, nil
+	}
+
+	return nil, fmt.Errorf("find ip failed")
 }
 
 func GetHostIP() (string, error) {

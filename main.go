@@ -13,5 +13,8 @@ func main() {
 	//fmt.Println(h)
 	//h.Parse()
 
+	fmt.Println(wslcli.ListAll())
+	fmt.Println(wslcli.RunningDistros())
+	fmt.Println(wslcli.GetIP("Ubuntu-20.04"))
 	fmt.Println(wslcli.GetHostIP())
 }
