@@ -56,12 +56,11 @@ func GetHostIP() (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("wsl -l -v failed: %w", err)
 	}
-	result := string(out)
 
-	scanner := bufio.NewScanner(strings.NewReader(result))
+	scanner := bufio.NewScanner(bytes.NewReader(out))
 	for scanner.Scan() {
 		line := scanner.Text()
-		line = strings.Trim(line, " ")
+		line = strings.TrimSpace(line)
 		var (
 			fid          string
 			ip           string
