@@ -22,18 +22,33 @@ func main() {
 
 	fmt.Println("===========================")
 
-	blocks := h.GetBlocks()
-	for ix := 0; ix < len(blocks); ix++ {
-		fmt.Println(blocks[ix])
-	}
+	//blocks := h.GetBlocks()
+	//for name, block := range blocks {
+	//	fmt.Println(name, block)
+	//}
 
-	hosts := make(map[int]*hostsapi.HostNameLine)
-	hosts[0] = &hostsapi.HostNameLine{
-		Address:  "172.18.156.43",
+	//fmt.Println(h.HasBlock("Ubuntu-20.04"))
+	//fmt.Println(h.HasBlockHostname("Ubuntu-20.04", "ubuntu2004.wsl"))
+
+	hosts := make(map[int]*hostsapi.HostnameLine)
+	hosts[0] = &hostsapi.HostnameLine{
+		Address:  "172.18.156.44",
 		Hostname: "ubuntu2004.wsl",
 	}
-
-	h.UpdateBlock("Ubuntu-20.04", hosts)
+	hosts[1] = &hostsapi.HostnameLine{
+		Address:  "172.18.156.43",
+		Hostname: "wsl.local",
+	}
+	hosts[2] = &hostsapi.HostnameLine{
+		Address:  "172.18.156.43",
+		Hostname: "www.nxadmin.test",
+	}
+	hosts[3] = &hostsapi.HostnameLine{
+		Address:  "172.18.156.43",
+		Hostname: "www.sshotel.test",
+	}
+	h.ChangeBlockHostnames("Ubuntu-20.0411", hosts)
+	h.Save()
 
 	//fmt.Println(wslcli.ListAll())
 	//fmt.Println(wslcli.RunningDistros())
